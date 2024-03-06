@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.geradorsenhas.ui.theme.GeradorSenhasTheme
+import com.example.geradorsenhas.ui.theme.corAzulPrincipal
 import com.example.geradorsenhas.ui.theme.fontSora
 
 class MainActivity : ComponentActivity() {
@@ -56,22 +57,24 @@ fun App(){
         Box(modifier = Modifier
             .fillMaxWidth()
         ){
+            Text(text = "Gerador de Senhas", fontFamily = fontSora, fontWeight = FontWeight.ExtraBold,
+                color = Color.White,
+                modifier = Modifier.background(Color.Blue, RoundedCornerShape(16))
+                    .padding(8.dp)
+            )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()){
+                    .wrapContentHeight()
+                    .padding(top = 50.dp)){
                     Column(modifier = Modifier.fillMaxWidth()
                         .border(1.5.dp, Color.LightGray, RoundedCornerShape(15))
                         .padding(8.dp)) {
-                        Text(text = "Gerador de Senhas", fontFamily = fontSora, fontWeight = FontWeight.ExtraBold,
-                            modifier = Modifier
-                                .border(1.5.dp, Color.DarkGray, RoundedCornerShape(15))
-                                .padding(8.dp)
-                        )
-                        Row (modifier = Modifier.fillMaxWidth().padding(top = 16.dp)){
+                        Row (modifier = Modifier.fillMaxWidth()){
                             Text(text = "Caracteres Especiais ?",
                                 modifier = Modifier.padding(end = 10.dp),
-                                fontFamily = fontSora, fontWeight = FontWeight.Normal)
+                                fontFamily = fontSora, fontWeight = FontWeight.SemiBold,
+                                color = Color.Black)
                             Checkbox(checked = true, onCheckedChange = validarEscolhaQtdCaracters(), modifier = Modifier
                                 .background(Color.White, RoundedCornerShape(15))
                                 .border(1.5.dp, Color.LightGray, RoundedCornerShape(15))
@@ -80,7 +83,8 @@ fun App(){
                          Row(modifier = Modifier.fillMaxWidth().padding(top = 16.dp)){
                              Text(text = "Com números ?",
                                  modifier = Modifier.padding(end = 10.dp),
-                                 fontFamily = fontSora, fontWeight = FontWeight.Normal)
+                                 fontFamily = fontSora, fontWeight = FontWeight.SemiBold,
+                                 color = Color.Black)
                              Checkbox(checked = true, onCheckedChange = validarEscolhaQtdCaracters(), modifier = Modifier
                                  .background(Color.White, RoundedCornerShape(15))
                                  .border(1.5.dp, Color.LightGray, RoundedCornerShape(15))

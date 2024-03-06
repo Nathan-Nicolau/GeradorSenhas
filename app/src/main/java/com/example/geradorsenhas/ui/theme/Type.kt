@@ -1,6 +1,7 @@
 package com.example.geradorsenhas.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -39,4 +40,8 @@ val fontSora = FontFamily(
     Font(R.font.sora, FontWeight.Normal),
     Font(R.font.sora_semibold, FontWeight.SemiBold),
     Font(R.font.sora_extrabold, FontWeight.ExtraBold)
+)
+
+val corAzulPrincipal = Color(
+    R.color.azul_principal
 )
