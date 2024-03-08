@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,6 +69,10 @@ fun App(){
     }
 
     var qtdCaracteres by remember {
+        mutableStateOf("")
+    }
+
+    var senhaFinalGerada by remember {
         mutableStateOf("")
     }
 
@@ -131,15 +136,11 @@ fun App(){
                             Row(modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 8.dp, start = 8.dp, end = 8.dp),
-                                horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.CenterVertically){
-                                Text(text = "Caracteres", fontFamily = fontSora,
-                                    fontWeight = FontWeight.SemiBold, color = Color.Black,
-                                    modifier = Modifier.padding(end= 8.dp))
-
+                                horizontalArrangement = Arrangement.Start){
                                 OutlinedTextField(value = qtdCaracteres,
                                     onValueChange = {qtdNova -> qtdCaracteres = qtdNova},
-                                    label = {Text(text = "Máximo de 20", fontFamily = fontSora, fontSize = 10.sp )},
+                                    label = {Text(text = "Quantidade de Caracteres", fontFamily = fontSora, fontSize = 10.sp )},
+                                    textStyle = TextStyle.Default,
                                     maxLines = 1,
                                     shape = RoundedCornerShape(20),
                                     modifier = Modifier
@@ -162,13 +163,19 @@ fun App(){
                                     Text(text = "Gere sua senha com o botão abaixo",
                                         fontFamily = fontSora, fontWeight = FontWeight.SemiBold)
 
-                                    ElevatedButton(onClick = { /*TODO*/ },
+                                    ElevatedButton(onClick = { senhaFinalGerada == gerarSenha(
+                                        temEspeciais = caracteresEspeciais ,
+                                        temNumeros = comNumeros,
+                                        quantidade = 9
+                                    )},
                                         shape = ButtonDefaults.elevatedShape,
                                         colors = ButtonDefaults.buttonColors(Color.Blue),
                                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp))
                                     {
                                         Text(text  = "Gerar Senha", fontFamily = fontSora, fontWeight = FontWeight.ExtraBold)
                                     }
+
+                                    Text(text= "Senha gerada foi: " + senhaFinalGerada)
                                 }
                             }
                         }
@@ -178,7 +185,7 @@ fun App(){
         }
 }
 
-@Composable
+
 fun gerarSenha(temEspeciais: Boolean, temNumeros: Boolean, quantidade: Int): String{
 
     var mensagemInformativa: String
@@ -194,7 +201,7 @@ fun gerarSenha(temEspeciais: Boolean, temNumeros: Boolean, quantidade: Int): Str
     var quantidadeLetras = 0
     if(quantidadeTotal < 6){
         mensagemInformativa = "A senha deve conter no mínimo 6 caracteres"
-        Toast.makeText(LocalContext.current,mensagemInformativa, Toast.LENGTH_LONG).show()
+//        Toast.makeText(LocalContext.current,mensagemInformativa, Toast.LENGTH_LONG).show()
     }else{
         if(temEspeciais){
             //6 / 3 = 2
