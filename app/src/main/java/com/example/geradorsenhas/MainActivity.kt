@@ -3,12 +3,12 @@ package com.example.geradorsenhas
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,12 +23,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -42,11 +45,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -92,8 +95,29 @@ fun App(){
     Scaffold(
         containerColor = Color.White,
         modifier = Modifier
-            .fillMaxSize()
-            .padding(4.dp)
+            .fillMaxSize(),
+        bottomBar = {
+            BottomAppBar(containerColor = Color.LightGray,
+                modifier = Modifier.height(80.dp)
+                    .fillMaxWidth()
+                ) {
+                Row(horizontalArrangement = Arrangement.Center) {
+                    IconButton(onClick = { /*TODO*/ }, modifier = Modifier.weight(1f)) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.gerar_senhas),
+                            contentDescription = null
+                        )
+                    }
+
+                    IconButton(onClick = { /*TODO*/ },modifier = Modifier.weight(1f)) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.passwords),
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
+        }
     ) {
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -125,7 +149,7 @@ fun App(){
                                 .padding(8.dp)){
                             Row (modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 8.dp),
+                                .padding(start = 6.dp),
                                 horizontalArrangement = Arrangement.Start,
                                 verticalAlignment = Alignment.CenterVertically){
                                 Text(text = "Caracteres Especiais ?",
@@ -140,7 +164,7 @@ fun App(){
                             }
                             Row(modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 8.dp),
+                                .padding(start = 6.dp),
                                 horizontalArrangement = Arrangement.Start,
                                 verticalAlignment = Alignment.CenterVertically){
                                 Text(text = "Com números ?",
@@ -157,7 +181,7 @@ fun App(){
                                 .fillMaxWidth()
                                 .padding(bottom = 8.dp, start = 8.dp, end = 8.dp),
                                 horizontalArrangement = Arrangement.Start){
-                                OutlinedTextField(value = qtdCaracteres ?: "6",
+                                OutlinedTextField(value = qtdCaracteres ?: "",
                                     onValueChange = {qtdNova -> qtdCaracteres = qtdNova},
                                     label = {Text(text = "Quantidade de Caracteres",
                                         fontFamily = fontSora,
@@ -171,7 +195,9 @@ fun App(){
                                         .fillMaxWidth()
                                         .height(60.dp),
                                     placeholder = {Text(text = "6", color = Color.LightGray, fontSize = 12.sp, fontFamily = fontSora, fontWeight = FontWeight.SemiBold)},
-                                    colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = AzulPrincipal))
+                                    colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = AzulPrincipal),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                                )
                             }
                         }
                         //Coluna pai do botão
@@ -180,13 +206,15 @@ fun App(){
                                 .fillMaxWidth()
                                 .wrapContentHeight()
                                 .padding(top = 16.dp)
-                                .border(1.5.dp, Color.LightGray, RoundedCornerShape(5))){
+                                .border(1.5.dp, Color.LightGray, RoundedCornerShape(8))){
                             Box(modifier = Modifier
                                 .wrapContentHeight()
-                                .padding(8.dp)){
+                                .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 10.dp)){
                                 Column(modifier = Modifier.wrapContentHeight()){
                                     Text(text = "Gere sua senha com o botão abaixo",
-                                        fontFamily = fontSora, fontWeight = FontWeight.SemiBold)
+                                        fontFamily = fontSora, fontWeight = FontWeight.SemiBold,
+                                        modifier = Modifier.fillMaxWidth())
+
                                     Row(modifier = Modifier.wrapContentHeight(),
                                     verticalAlignment = Alignment.Bottom) {
                                         ElevatedButton(
@@ -201,7 +229,9 @@ fun App(){
                                             elevation = ButtonDefaults.buttonElevation(
                                                 defaultElevation = 10.dp
                                             ),
-                                            modifier = Modifier.height(70.dp)
+                                            modifier = Modifier
+                                                .height(70.dp)
+                                                .wrapContentWidth()
                                         )
                                         {
                                             Row() {
@@ -216,12 +246,15 @@ fun App(){
                                                     contentDescription = null,)
                                             }
                                         }
-                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Spacer(modifier = Modifier.width(6.dp))
 
                                         Column(modifier = Modifier.wrapContentHeight()){
-                                            Text(text = "Senha gerada: ",
+                                            Text(text = "Senha gerada ",
                                                 fontFamily = fontSora,
-                                                fontWeight = FontWeight.Normal)
+                                                fontWeight = FontWeight.Normal,
+                                                modifier = Modifier.fillMaxWidth())
+
+                                            Spacer(modifier = Modifier.height(8.dp))
 
                                             Row(modifier = Modifier
                                                 .height(50.dp)
@@ -255,7 +288,7 @@ fun App(){
                                                     modifier = Modifier
                                                         .fillMaxHeight()
                                                         .wrapContentWidth()
-                                                        .weight(1f)){
+                                                        ){
                                                     Button(
                                                         modifier = Modifier.wrapContentWidth(align = Alignment.End),
                                                         onClick = { /*TODO*/ },
