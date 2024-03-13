@@ -2,6 +2,9 @@
 package com.example.geradorsenhas
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -45,6 +48,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -53,6 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.getSystemService
 import com.example.geradorsenhas.ui.theme.AzulPrincipal
 import com.example.geradorsenhas.ui.theme.GeradorSenhasTheme
 import com.example.geradorsenhas.ui.theme.fontSora
@@ -71,7 +77,9 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun App(){
-    //Variável para armazenar valor da primeira CheckBox
+
+    val context = LocalContext.current
+
     var caracteresEspeciais by remember {
         mutableStateOf(false)
     }
@@ -88,7 +96,7 @@ fun App(){
         mutableStateOf("")
     }
 
-    var senhaCopiada by remember {
+    var tagSenha by remember {
         mutableStateOf("")
     }
 
@@ -98,7 +106,8 @@ fun App(){
             .fillMaxSize(),
         bottomBar = {
             BottomAppBar(containerColor = Color.LightGray,
-                modifier = Modifier.height(80.dp)
+                modifier = Modifier
+                    .height(80.dp)
                     .fillMaxWidth()
                 ) {
                 Row(horizontalArrangement = Arrangement.Center) {
@@ -226,9 +235,7 @@ fun App(){
                                             },
                                             shape = RoundedCornerShape(20),
                                             colors = ButtonDefaults.buttonColors(Color.Blue),
-                                            elevation = ButtonDefaults.buttonElevation(
-                                                defaultElevation = 10.dp
-                                            ),
+                                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
                                             modifier = Modifier
                                                 .height(70.dp)
                                                 .wrapContentWidth()
@@ -291,7 +298,10 @@ fun App(){
                                                         ){
                                                     Button(
                                                         modifier = Modifier.wrapContentWidth(align = Alignment.End),
-                                                        onClick = { /*TODO*/ },
+                                                        onClick = { copiarSenhaAreaTransferencia(
+                                                            context = context,
+                                                            senhaGerada = senhaFinalGerada
+                                                        )},
                                                         colors = ButtonDefaults.buttonColors(Color.White),
                                                     ) {
                                                         Image(painter = painterResource(id = R.drawable.copy),
@@ -317,7 +327,7 @@ fun gerarSenha(temEspeciais: Boolean, temNumeros: Boolean, quantidade: String): 
     var mensagemInformativa: String
     var quantidadeTotal = quantidade.toInt()
     var senhaGerada: String = ""
-    val quantidadeTotalAuxiliar = quantidadeTotal
+    var quantidadeTotalAuxiliar = quantidadeTotal
     val especiais = "!()@#$%&*_"
     val numeros = "0123456789"
     val letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -329,59 +339,88 @@ fun gerarSenha(temEspeciais: Boolean, temNumeros: Boolean, quantidade: String): 
         mensagemInformativa = "A senha deve conter no mínimo 6 caracteres"
 //        Toast.makeText(LocalContext.current,mensagemInformativa, Toast.LENGTH_LONG).show()
     }else{
-        if(temEspeciais){
-            //6 / 3 = 2
-            quantidadeLetras = quantidadeTotal.div(3)
-            //subtrai a quantidade de especiais
-            quantidadeTotal -= quantidadeLetras
-        }
 
-        if(temNumeros){
-            //Significa que é par
-            if(quantidadeTotal / 2 == 0){
-                quantidadeEspeciais = quantidadeTotal / 2
-                quantidadeNumeros = quantidadeTotal / 2
-            }else {
-                quantidadeEspeciais = quantidadeTotal.div(2)
-                quantidadeTotal -= quantidadeEspeciais
-                quantidadeNumeros = quantidadeTotal
+        if(temEspeciais && temNumeros){
+            quantidadeLetras = quantidadeTotal.div(3)
+            quantidadeTotalAuxiliar -= quantidadeLetras
+            quantidadeEspeciais = quantidadeTotalAuxiliar.div(2)
+            quantidadeNumeros = quantidadeTotalAuxiliar.div(2)
+            var totalCaracteres = quantidadeLetras + quantidadeEspeciais + quantidadeNumeros;
+            if(totalCaracteres < quantidadeTotal){
+                var diferenca = quantidadeTotal - totalCaracteres
+                quantidadeLetras += diferenca
             }
         }
-
-        if(!temNumeros && !temEspeciais){
+        else if(temEspeciais && !temNumeros){
+            quantidadeLetras = quantidadeTotal.div(2)
+            quantidadeTotalAuxiliar -= quantidadeLetras
+            quantidadeEspeciais = quantidadeTotalAuxiliar.div(2)
+            var totalCaracteres = quantidadeLetras + quantidadeEspeciais
+            if(totalCaracteres < quantidadeTotal){
+                var diferenca = quantidadeTotal - totalCaracteres
+                quantidadeLetras += diferenca
+            }
+        }
+        else if(!temEspeciais && temNumeros){
+            quantidadeLetras = quantidadeTotal.div(2)
+            quantidadeTotalAuxiliar -= quantidadeLetras
+            quantidadeNumeros = quantidadeTotalAuxiliar.div(2)
+            var totalCaracteres = quantidadeLetras + quantidadeNumeros
+            if(totalCaracteres < quantidadeTotal){
+                var diferenca = quantidadeTotal - totalCaracteres
+                quantidadeLetras += diferenca
+            }
+        }
+        else {
             quantidadeLetras = quantidadeTotal
         }
+
 
         var numerosSenha = ""
         var especiaisSenha = ""
         var letrasSenha = ""
         if(temNumeros){
-            for(i in 0..quantidadeNumeros){
+            for(i in 0 until quantidadeNumeros){
                 var posicao = Random.nextInt(0,numeros.length)
                 numerosSenha += numeros[posicao]
             }
         }
 
         if(temEspeciais){
-            for(i in 0..quantidadeEspeciais){
+            for(i in 0 until quantidadeEspeciais){
                 var posicao = Random.nextInt(0,especiais.length)
                 especiaisSenha += especiais[posicao];
             }
         }
 
-        for(i in 0..quantidadeLetras){
+        for(i in 0 until quantidadeLetras){
             var posicao = Random.nextInt(0,letras.length)
             letrasSenha += letras[posicao];
         }
 
         if(!temNumeros && !temEspeciais){
-            senhaGerada = letrasSenha;
-        }else {
+            senhaGerada = letrasSenha
+        }
+        else if(temNumeros && !temEspeciais){
+            senhaGerada = letrasSenha + numerosSenha
+        }
+        else if(!temNumeros){
+            senhaGerada = letrasSenha + especiaisSenha
+        }
+        else {
             senhaGerada = letrasSenha + especiaisSenha + numerosSenha
         }
     }
 
     return senhaGerada
+}
+
+
+fun copiarSenhaAreaTransferencia(context: Context , senhaGerada: String){
+    val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("Senha gerada", senhaGerada)
+    clipboardManager.setPrimaryClip(clip)
+
 }
 
 @Preview(showBackground = true)
