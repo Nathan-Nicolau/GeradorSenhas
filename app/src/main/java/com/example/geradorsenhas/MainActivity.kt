@@ -6,6 +6,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -38,6 +39,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ElevatedButton
@@ -76,6 +78,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat.getSystemService
 import com.example.geradorsenhas.ui.theme.AzulPrincipal
 import com.example.geradorsenhas.ui.theme.GeradorSenhasTheme
+import com.example.geradorsenhas.ui.theme.VermelhoCancelar
 import com.example.geradorsenhas.ui.theme.fontSora
 import kotlin.random.Random
 
@@ -111,6 +114,10 @@ fun App(){
         mutableStateOf("")
     }
 
+    var salvarSenhaAoGerar by remember {
+        mutableStateOf(false)
+    }
+
     var tagSenha by remember {
         mutableStateOf("")
     }
@@ -118,6 +125,7 @@ fun App(){
     var showDialogSalvar by remember {
         mutableStateOf(false)
     }
+
 
     Scaffold(
         containerColor = Color.White,
@@ -247,11 +255,11 @@ fun App(){
                                     verticalAlignment = Alignment.Bottom) {
                                         ElevatedButton(
                                             onClick = {senhaFinalGerada = gerarSenha(
+                                                    context = context,
                                                     temEspeciais = caracteresEspeciais,
                                                     temNumeros = comNumeros,
                                                     quantidade = qtdCaracteres ?: "6"
-                                                )
-                                            },
+                                                )},
                                             shape = RoundedCornerShape(20),
                                             colors = ButtonDefaults.buttonColors(Color.Blue),
                                             elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
@@ -317,7 +325,8 @@ fun App(){
                                                         ){
                                                     Button(
                                                         modifier = Modifier.wrapContentWidth(align = Alignment.End),
-                                                        onClick = { copiarSenhaAreaTransferencia(
+                                                        onClick = { showDialogSalvar = true
+                                                            copiarSenhaAreaTransferencia(
                                                             context = context,
                                                             senhaGerada = senhaFinalGerada
                                                         )},
@@ -328,9 +337,7 @@ fun App(){
                                                     }
                                                 }
                                             }
-                                            }
                                         }
-
                                     }
                                 }
                             }
@@ -339,52 +346,156 @@ fun App(){
                 }
             }
         }
+    if(showDialogSalvar) {
+        showDialogSalvar = dialogSalvarSenha(senhaGerada = senhaFinalGerada, show = showDialogSalvar)
+    }
 
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun dialogSalvarSenha(senhaGerada: String){
+fun dialogSalvarSenha(senhaGerada: String, show: Boolean): Boolean{
     var senhaNova by remember {
         mutableStateOf("")
     }
 
     var mostrar by remember {
-        mutableStateOf(true)
+        mutableStateOf(show)
     }
 
+    if(mostrar) {
+        Dialog(onDismissRequest = { mostrar = false }) {
+            Card(shape = RoundedCornerShape(5)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.7f), horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(
+                                onClick = { mostrar = false }, modifier = Modifier
+                                    .border(2.dp, Color.White, shape = ShapeDefaults.ExtraLarge)
+                                    .background(Color.Red, ShapeDefaults.ExtraLarge)
+                                    .height(35.dp)
+                                    .width(35.dp),
+                                colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.close_white),
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        OutlinedTextField(
+                            value = senhaNova,
+                            onValueChange = { senhaNovaGerada -> senhaNova = senhaNovaGerada },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp),
+                            shape = RoundedCornerShape(20),
+                            label = {
+                                Text(
+                                    text = "Nome da Senha",
+                                    fontFamily = fontSora,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 12.sp,
+                                    color = AzulPrincipal
+                                )
+                            },
+                            placeholder = {
+                                Text(
+                                    text = "6",
+                                    color = Color.LightGray,
+                                    fontSize = 12.sp,
+                                    fontFamily = fontSora,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            },
+                            colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = AzulPrincipal),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = senhaGerada,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = fontSora, color = Color.Black,
+                        modifier = Modifier
+                            .border(2.dp, Color.LightGray, RoundedCornerShape(20))
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    )
 
-    Dialog(onDismissRequest = { mostrar =  false },
-        content = {
-
-        })
-
-    Dialog(onDismissRequest = {mostrar = false}){
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .padding(8.dp)){
-            Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.End ){
-
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)){
-                    Text(text = "Salve sua senha com uma TAG", modifier = Modifier.fillMaxWidth())
-                }
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.9f)
-                    ,horizontalArrangement = Arrangement.End){
-                    IconButton(onClick = { mostrar = false}, modifier = Modifier
-                        .border(2.dp,Color.LightGray,shape = ShapeDefaults.Large),
-                        colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)) {
-                        Image(imageVector = Icons.Rounded.Close, contentDescription = null, )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.weight(1f),
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            ElevatedButton(
+                                onClick = { mostrar = false },
+                                shape = RoundedCornerShape(20),
+                                colors = ButtonDefaults.buttonColors(VermelhoCancelar),
+                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
+                                modifier = Modifier
+                                    .height(50.dp)
+                                    .wrapContentWidth()
+                            ) {
+                                Text(
+                                    text = "Cancelar",
+                                    fontFamily = fontSora,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp
+                                )
+                            }
+                        }
+                        Row(
+                            modifier = Modifier.weight(1f),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            ElevatedButton(
+                                onClick = { mostrar = false },
+                                shape = RoundedCornerShape(20),
+                                colors = ButtonDefaults.buttonColors(AzulPrincipal),
+                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
+                                modifier = Modifier
+                                    .height(50.dp)
+                                    .wrapContentWidth()
+                            ) {
+                                Text(
+                                    text = "Salvar",
+                                    fontFamily = fontSora,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp
+                                )
+                                Image(
+                                    painter = painterResource(id = R.drawable.salvar_senha),
+                                    contentDescription = null
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
     }
-
+    return mostrar
 }
 
-fun gerarSenha(temEspeciais: Boolean, temNumeros: Boolean, quantidade: String): String{
+fun gerarSenha(context:Context, temEspeciais: Boolean, temNumeros: Boolean, quantidade: String): String{
 
     var mensagemInformativa: String
     var quantidadeTotal = quantidade.toInt()
@@ -399,7 +510,7 @@ fun gerarSenha(temEspeciais: Boolean, temNumeros: Boolean, quantidade: String): 
     var quantidadeLetras = 0
     if(quantidadeTotal < 6){
         mensagemInformativa = "A senha deve conter no mínimo 6 caracteres"
-//        Toast.makeText(LocalContext.current,mensagemInformativa, Toast.LENGTH_LONG).show()
+        Toast.makeText(context,mensagemInformativa, Toast.LENGTH_LONG).show()
     }else{
 
         if(temEspeciais && temNumeros){
@@ -482,13 +593,14 @@ fun copiarSenhaAreaTransferencia(context: Context , senhaGerada: String){
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val clip = ClipData.newPlainText("Senha gerada", senhaGerada)
     clipboardManager.setPrimaryClip(clip)
-
+    Toast.makeText(context,"Senha copiada para a Área de Transferência", Toast.LENGTH_SHORT).show()
 }
 
 @Preview(showBackground = true)
 @Composable
 fun AppPreview() {
     GeradorSenhasTheme {
-        dialogSalvarSenha("Senha")
+//        dialogSalvarSenha(senhaGerada = "teste", show = true )
+        App()
     }
 }
