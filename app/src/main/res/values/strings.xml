@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">GeradorSenhas</string>
+    <string name="title_activity_senhas_salvas">SenhasSalvasActivity</string>
+    <string name="title_activity_gerar_senhas">GerarSenhasActivity</string>
 </resources>
