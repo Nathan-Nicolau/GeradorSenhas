@@ -1,6 +1,9 @@
 package com.example.geradorsenhas.telas
 
 import android.annotation.SuppressLint
+import android.hardware.Sensor
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,12 +31,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.geradorsenhas.dao.SenhaDAO
+import com.example.geradorsenhas.db.DatabaseSenhas
 import com.example.geradorsenhas.ui.theme.AzulPrincipal
 import com.example.geradorsenhas.ui.theme.GeradorSenhasTheme
 import com.example.geradorsenhas.ui.theme.fontSora
+import com.example.geradorsenhas.vo.Senha
+
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -42,6 +51,12 @@ fun SenhasSalvas(){
     var senhaPesquisada by remember {
         mutableStateOf("Senha")
     }
+
+    val context = LocalContext.current
+    var database = DatabaseSenhas(context)
+    var senhaDAO = SenhaDAO(database)
+
+    var senhas :List<Senha> = senhaDAO.getTodasSenhas()
 
     Scaffold(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -66,6 +81,12 @@ fun SenhasSalvas(){
             )
         }
         Spacer(modifier = Modifier.height(4.dp))
+        Column(modifier = Modifier.fillMaxSize()){
+            senhas.forEach {
+                Text(text = "Nome da senha:")
+                Text(text = it.nomeSenha)
+            }
+        }
        
     }
 }
@@ -74,6 +95,6 @@ fun SenhasSalvas(){
 @Preview
 fun PreviewSenhasSalvas(){
     GeradorSenhasTheme {
-        SenhasSalvas()
+//        SenhasSalvas()
     }
 }

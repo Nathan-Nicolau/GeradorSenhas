@@ -2,6 +2,7 @@ package com.example.geradorsenhas
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -21,7 +22,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.room.Room
 import com.example.geradorsenhas.enums.TelasEnum
 import com.example.geradorsenhas.navegacao.listaIconesNavegacao
 import com.example.geradorsenhas.telas.GerarSenhas
@@ -30,6 +30,7 @@ import com.example.geradorsenhas.ui.theme.AzulPrincipal
 import com.example.geradorsenhas.ui.theme.CinzaContainer
 import com.example.geradorsenhas.ui.theme.GeradorSenhasTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun AppNavigation( ){

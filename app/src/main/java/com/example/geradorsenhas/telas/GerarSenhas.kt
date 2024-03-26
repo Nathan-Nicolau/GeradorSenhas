@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -55,10 +57,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.geradorsenhas.R
+import com.example.geradorsenhas.dao.SenhaDAO
+import com.example.geradorsenhas.db.DatabaseSenhas
 import com.example.geradorsenhas.ui.theme.AzulPrincipal
 import com.example.geradorsenhas.ui.theme.GeradorSenhasTheme
 import com.example.geradorsenhas.ui.theme.VermelhoCancelar
 import com.example.geradorsenhas.ui.theme.fontSora
+import com.example.geradorsenhas.vo.Senha
 import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -302,6 +307,7 @@ fun GerarSenhas(){
 
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun dialogSalvarSenha(senhaGerada: String, show: Boolean, context: Context): Boolean{
@@ -316,6 +322,10 @@ fun dialogSalvarSenha(senhaGerada: String, show: Boolean, context: Context): Boo
     var senhaCriada by remember {
         mutableStateOf("")
     }
+
+    var database = DatabaseSenhas(context)
+    var senhaDAO =  SenhaDAO(database)
+    var novoIdSenha = senhaDAO.getNovoId()
 
 
     if(mostrar) {
@@ -400,8 +410,7 @@ fun dialogSalvarSenha(senhaGerada: String, show: Boolean, context: Context): Boo
                             horizontalArrangement = Arrangement.Start
                         ) {
                             ElevatedButton(
-                                onClick = { mostrar = false
-                                          toastSenhaSalva(context)},
+                                onClick = { mostrar = false},
                                 shape = RoundedCornerShape(20),
                                 colors = ButtonDefaults.buttonColors(VermelhoCancelar),
                                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
@@ -423,7 +432,8 @@ fun dialogSalvarSenha(senhaGerada: String, show: Boolean, context: Context): Boo
                         ) {
                             ElevatedButton(
                                 onClick = { mostrar = false
-                                          },
+                                    toastSenhaSalva(context)
+                                          senhaDAO.insertNovaSenha(Senha(novoIdSenha,nomeNovaSenha,senhaGerada))},
                                 shape = RoundedCornerShape(20),
                                 colors = ButtonDefaults.buttonColors(AzulPrincipal),
                                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
@@ -459,7 +469,7 @@ fun gerarSenha(context: Context, temEspeciais: Boolean, temNumeros: Boolean, qua
 
     var mensagemInformativa: String
     var quantidadeTotal = quantidade.toInt()
-    var senhaGerada: String = ""
+    var senhaGerada = ""
     var quantidadeTotalAuxiliar = quantidadeTotal
     val especiais = "!()@#$%&*_"
     val numeros = "0123456789"
