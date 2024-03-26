@@ -323,8 +323,7 @@ fun dialogSalvarSenha(senhaGerada: String, show: Boolean, context: Context): Boo
         mutableStateOf("")
     }
 
-    var database = DatabaseSenhas(context)
-    var senhaDAO =  SenhaDAO(database)
+    var senhaDAO =  SenhaDAO(context)
     var novoIdSenha = senhaDAO.getNovoId()
 
 
