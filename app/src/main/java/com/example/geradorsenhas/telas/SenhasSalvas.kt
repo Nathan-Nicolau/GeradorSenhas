@@ -5,6 +5,7 @@ import android.hardware.Sensor
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,8 +32,12 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -48,11 +54,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.geradorsenhas.R
 import com.example.geradorsenhas.dao.SenhaDAO
 import com.example.geradorsenhas.db.DatabaseSenhas
 import com.example.geradorsenhas.ui.theme.AzulPrincipal
 import com.example.geradorsenhas.ui.theme.GeradorSenhasTheme
+import com.example.geradorsenhas.ui.theme.VermelhoCancelar
 import com.example.geradorsenhas.ui.theme.fontSora
 import com.example.geradorsenhas.vo.Senha
 
@@ -155,12 +163,66 @@ fun CardSenhaSalva(nomeSenha: String, valorSenha: String){
 
     }
 }
+@Composable
+fun DialogExcluirSenha(){
+    Dialog(
+        onDismissRequest = { /*TODO*/ }) {
+        Card(
+            modifier = Modifier
+                .wrapContentSize(),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            shape = RoundedCornerShape(15)
+        ){
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(8.dp),
+                horizontalArrangement = Arrangement.Center){
 
+                Text(text = "Deseja realmente excluir a Senha ?",
+                    fontFamily = fontSora, fontWeight = FontWeight.Medium)
+            }
+
+            Row(modifier = Modifier.fillMaxWidth()){
+                Row(modifier = Modifier
+                    .weight(1f)
+                    .padding(8.dp)
+                    .height(50.dp),
+                    horizontalArrangement = Arrangement.Start){
+                    ElevatedButton(onClick = { /*TODO*/ },
+                        shape = RoundedCornerShape(20),
+                        colors = ButtonDefaults.buttonColors(containerColor = VermelhoCancelar),
+                        modifier = Modifier.fillMaxHeight()
+                    ) {
+                        Text(text = "Cancelar", fontFamily = fontSora, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+                Row(modifier = Modifier
+                    .weight(1f)
+                    .padding(8.dp)
+                    .height(50.dp),
+                    horizontalArrangement = Arrangement.End){
+                    ElevatedButton(onClick = { /*TODO*/ },
+                        shape = RoundedCornerShape(20),
+                        colors = ButtonDefaults.buttonColors(containerColor = AzulPrincipal),
+                        modifier = Modifier.fillMaxHeight()
+                    ) {
+                        Text(text = "Excluir", fontFamily = fontSora, fontWeight = FontWeight.SemiBold)
+                        Icon(painter = painterResource(id = R.drawable.delete_white_24dp), contentDescription = null)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 @Preview
 fun PreviewSenhasSalvas(){
     GeradorSenhasTheme {
+//        CardSenhaSalva("Facebook","*******")
 //        SenhasSalvas()
-        CardSenhaSalva("Facebook","*******")
+        DialogExcluirSenha()
     }
 }

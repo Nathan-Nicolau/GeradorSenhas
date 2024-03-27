@@ -1,6 +1,8 @@
 package com.example.geradorsenhas
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,6 +32,7 @@ import com.example.geradorsenhas.ui.theme.AzulPrincipal
 import com.example.geradorsenhas.ui.theme.CinzaContainer
 import com.example.geradorsenhas.ui.theme.GeradorSenhasTheme
 
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
