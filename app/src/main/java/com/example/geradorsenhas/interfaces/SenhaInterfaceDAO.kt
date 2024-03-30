@@ -7,4 +7,5 @@ interface SenhaInterfaceDAO {
     fun getSenhaByNome(nome: String) : List<Senha>
     fun insertNovaSenha(senhaNova: Senha)
     fun getNovoId(): Int
+    fun deleteSenhaById(idSenha: Int): Boolean
 }

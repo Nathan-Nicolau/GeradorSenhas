@@ -76,72 +76,87 @@ fun SenhasSalvas(){
 
     val context = LocalContext.current
     var senhaDAO = SenhaDAO(context)
+    var senhas = senhaDAO.getTodasSenhas()
 
-    var senhas :List<Senha> = senhaDAO.getTodasSenhas()
-
-    Scaffold(modifier = Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                value = senhaPesquisada,
-                onValueChange = { nomeSenhaInformada -> { senhaPesquisada = nomeSenhaInformada } },
-                placeholder = {
-                    Text(
-                        text = "Digite a senha para pesquisar...",
-                        fontFamily = fontSora, fontWeight = FontWeight.SemiBold
-                    )
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = AzulPrincipal),
-                shape = RoundedCornerShape(15)
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-        Column(modifier = Modifier.fillMaxSize()){
-            senhas.forEach {
-                Spacer(modifier = Modifier.height(2.dp))
-                CardSenhaSalva(nomeSenha = it.nomeSenha, valorSenha = it.valorSenha)
+    Scaffold(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.White)) {
+        if(senhas.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Column(modifier = Modifier.fillMaxSize()) {
+                senhas.forEach {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    CardSenhaSalva(it)
+                }
+            }
+        }else{
+            Column(modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally){
+                Text(text = "Sem nenhuma senha salva", fontFamily = fontSora, fontWeight = FontWeight.SemiBold)
             }
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun CardSenhaSalva(nomeSenha: String, valorSenha: String){
-    Box(modifier = Modifier
-        .height(100.dp)
-        .fillMaxWidth()){
-        Card(colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp, pressedElevation = 15.dp )){
-            Row(modifier = Modifier.fillMaxSize()){
-                Column(modifier = Modifier
-                    .padding(8.dp)
-                    .weight(3.5f)){
-                    Text(text = "Nome da Senha " + nomeSenha, fontFamily = fontSora, fontWeight = FontWeight.SemiBold)
+fun CardSenhaSalva(senha: Senha){
+
+    var mostrarDialogExclusao by remember {
+        mutableStateOf(false)
+    }
+
+    val context = LocalContext.current
+    val senhaDAO = SenhaDAO(context)
+
+    Box(
+        modifier = Modifier
+            .height(100.dp)
+            .fillMaxWidth()
+            .padding(4.dp)
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 10.dp,
+                pressedElevation = 15.dp
+            )
+        ) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .weight(3.5f)
+                ) {
+                    Text(
+                        text = "Nome da Senha " + senha.nomeSenha,
+                        fontFamily = fontSora,
+                        fontWeight = FontWeight.SemiBold
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Row(){
-                        Text(text = valorSenha,
+                    Row() {
+                        Text(
+                            text = senha.valorSenha,
                             fontFamily = fontSora,
                             fontWeight = FontWeight.Normal,
                             modifier = Modifier
                                 .border(1.5.dp, Color.LightGray, RoundedCornerShape(15))
                                 .padding(10.dp)
-                                .fillMaxWidth())
+                                .fillMaxWidth()
+                        )
                     }
                 }
-                Column(modifier = Modifier
-                    .wrapContentWidth()
-                    .fillMaxHeight()
-                    .padding(12.dp),
+                Column(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .fillMaxHeight()
+                        .padding(12.dp),
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally){
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     ElevatedButton(
-                        onClick = { /*TODO*/ },
+                        onClick = { mostrarDialogExclusao = true },
                         shape = RoundedCornerShape(25),
                         colors = ButtonDefaults.buttonColors(containerColor = AzulPrincipal),
                         modifier = Modifier
@@ -149,10 +164,12 @@ fun CardSenhaSalva(nomeSenha: String, valorSenha: String){
                             .height(75.dp),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
                     ) {
-                        Column(modifier = Modifier.fillMaxSize()){
-                            Icon(painter = painterResource(id = R.drawable.delete_white_24dp),
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.delete_white_24dp),
                                 contentDescription = null,
-                                modifier = Modifier.fillMaxSize())
+                                modifier = Modifier.fillMaxSize()
+                            )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
@@ -160,60 +177,100 @@ fun CardSenhaSalva(nomeSenha: String, valorSenha: String){
             }
             Spacer(modifier = Modifier.height(2.dp))
         }
+    }
 
+    if(mostrarDialogExclusao){
+        mostrarDialogExclusao =
+            DialogExcluirSenha(
+            senhaDAO = senhaDAO,
+            senha = senha ,
+            mostrar = mostrarDialogExclusao)
     }
 }
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun DialogExcluirSenha(){
-    Dialog(
-        onDismissRequest = { /*TODO*/ }) {
-        Card(
-            modifier = Modifier
-                .wrapContentSize(),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            shape = RoundedCornerShape(15)
-        ){
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .padding(8.dp),
-                horizontalArrangement = Arrangement.Center){
+fun DialogExcluirSenha(senhaDAO: SenhaDAO, senha: Senha, mostrar: Boolean): Boolean{
 
-                Text(text = "Deseja realmente excluir a Senha ?",
-                    fontFamily = fontSora, fontWeight = FontWeight.Medium)
-            }
+    var mostrarDialog by remember {
+        mutableStateOf(mostrar)
+    }
 
-            Row(modifier = Modifier.fillMaxWidth()){
-                Row(modifier = Modifier
-                    .weight(1f)
-                    .padding(8.dp)
-                    .height(50.dp),
-                    horizontalArrangement = Arrangement.Start){
-                    ElevatedButton(onClick = { /*TODO*/ },
-                        shape = RoundedCornerShape(20),
-                        colors = ButtonDefaults.buttonColors(containerColor = VermelhoCancelar),
-                        modifier = Modifier.fillMaxHeight()
-                    ) {
-                        Text(text = "Cancelar", fontFamily = fontSora, fontWeight = FontWeight.SemiBold)
-                    }
+    if(mostrarDialog) {
+        Dialog(
+            onDismissRequest = { mostrarDialog = false }) {
+            Card(
+                modifier = Modifier
+                    .wrapContentSize(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(15)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    Text(
+                        text = "Deseja realmente excluir a Senha ?",
+                        fontFamily = fontSora, fontWeight = FontWeight.Medium
+                    )
                 }
-                Row(modifier = Modifier
-                    .weight(1f)
-                    .padding(8.dp)
-                    .height(50.dp),
-                    horizontalArrangement = Arrangement.End){
-                    ElevatedButton(onClick = { /*TODO*/ },
-                        shape = RoundedCornerShape(20),
-                        colors = ButtonDefaults.buttonColors(containerColor = AzulPrincipal),
-                        modifier = Modifier.fillMaxHeight()
+
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp)
+                            .height(50.dp),
+                        horizontalArrangement = Arrangement.Start
                     ) {
-                        Text(text = "Excluir", fontFamily = fontSora, fontWeight = FontWeight.SemiBold)
-                        Icon(painter = painterResource(id = R.drawable.delete_white_24dp), contentDescription = null)
+                        ElevatedButton(
+                            onClick = {
+                                mostrarDialog = false
+                            },
+                            shape = RoundedCornerShape(20),
+                            colors = ButtonDefaults.buttonColors(containerColor = VermelhoCancelar),
+                            modifier = Modifier.fillMaxHeight()
+                        ) {
+                            Text(
+                                text = "Cancelar",
+                                fontFamily = fontSora,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp)
+                            .height(50.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        ElevatedButton(
+                            onClick = {senhaDAO.deleteSenhaById(senha.idSenha)
+                                      mostrarDialog  = false},
+                            shape = RoundedCornerShape(20),
+                            colors = ButtonDefaults.buttonColors(containerColor = AzulPrincipal),
+                            modifier = Modifier.fillMaxHeight()
+                        ) {
+                            Text(
+                                text = "Excluir",
+                                fontFamily = fontSora,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Icon(
+                                painter = painterResource(id = R.drawable.delete_white_24dp),
+                                contentDescription = null
+                            )
+                        }
                     }
                 }
             }
         }
     }
+    return mostrarDialog
 }
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -222,7 +279,7 @@ fun DialogExcluirSenha(){
 fun PreviewSenhasSalvas(){
     GeradorSenhasTheme {
 //        CardSenhaSalva("Facebook","*******")
-//        SenhasSalvas()
-        DialogExcluirSenha()
+        SenhasSalvas()
+//        DialogExcluirSenha()
     }
 }

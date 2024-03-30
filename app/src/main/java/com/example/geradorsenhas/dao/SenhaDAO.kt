@@ -29,4 +29,9 @@ class SenhaDAO(context: Context): SenhaInterfaceDAO {
     override fun getNovoId(): Int {
         return database.getUltimoIdSenha()
     }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    override fun deleteSenhaById(idSenha: Int): Boolean {
+        return database.deleteSenhaPorId(idSenha)
+    }
 }

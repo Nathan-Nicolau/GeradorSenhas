@@ -77,4 +77,14 @@ class DatabaseSenhas(context: Context?) :
         cursor.close()
         return novoId
     }
+
+    fun deleteSenhaPorId(idSenha: Int) : Boolean{
+        var senhaExcluida = false
+        val db = readableDatabase
+        val cursor: Cursor = db.rawQuery("DELETE FROM $TABLE_NAME WHERE $ID = $idSenha", null)
+        if(cursor.moveToNext()){
+            senhaExcluida = true
+        }
+        return senhaExcluida
+    }
 }
