@@ -1,10 +1,8 @@
 package com.example.geradorsenhas.telas
 
 import android.annotation.SuppressLint
-import android.hardware.Sensor
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -18,28 +16,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ShapeDefaults
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,7 +44,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.geradorsenhas.R
 import com.example.geradorsenhas.dao.SenhaDAO
-import com.example.geradorsenhas.db.DatabaseSenhas
 import com.example.geradorsenhas.ui.theme.AzulPrincipal
 import com.example.geradorsenhas.ui.theme.GeradorSenhasTheme
 import com.example.geradorsenhas.ui.theme.VermelhoCancelar
@@ -70,30 +56,36 @@ import com.example.geradorsenhas.vo.Senha
 @Composable
 fun SenhasSalvas(){
 
-    var senhaPesquisada by remember {
-        mutableStateOf("Senha")
-    }
-
     val context = LocalContext.current
     var senhaDAO = SenhaDAO(context)
-    var senhas = senhaDAO.getTodasSenhas()
+    var senhas by remember {
+        mutableStateOf(senhaDAO.getTodasSenhas())
+    }
+
+    var temSenhas by remember {
+        mutableStateOf(senhas.isNotEmpty())
+    }
+
 
     Scaffold(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)) {
-        if(senhas.isNotEmpty()) {
+        if(temSenhas) {
             Spacer(modifier = Modifier.height(4.dp))
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)) {
                 senhas.forEach {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    CardSenhaSalva(it)
+                    temSenhas = CardSenhaSalva(it, senhas).isNotEmpty()
                 }
             }
         }else{
-            Column(modifier = Modifier.fillMaxSize(),
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally){
-                Text(text = "Sem nenhuma senha salva", fontFamily = fontSora, fontWeight = FontWeight.SemiBold)
+                Text(text = "Sem nenhuma senha salva", fontFamily = fontSora, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             }
         }
     }
@@ -101,103 +93,124 @@ fun SenhasSalvas(){
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun CardSenhaSalva(senha: Senha){
+fun CardSenhaSalva(senha: Senha, senhas: MutableList<Senha>): List<Senha>{
 
-    var mostrarDialogExclusao by remember {
+    var excluirSenha by remember {
         mutableStateOf(false)
+    }
+
+    var visivelExclusao by remember {
+        mutableStateOf(false)
+    }
+
+    var visivel by remember {
+        mutableStateOf(true)
+    }
+
+    var senhasAtualizadas by remember {
+        mutableStateOf(senhas)
     }
 
     val context = LocalContext.current
     val senhaDAO = SenhaDAO(context)
 
-    Box(
-        modifier = Modifier
-            .height(100.dp)
-            .fillMaxWidth()
-            .padding(4.dp)
-    ) {
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 10.dp,
-                pressedElevation = 15.dp
-            )
+    if(visivel) {
+        Box(
+            modifier = Modifier
+                .height(100.dp)
+                .fillMaxWidth()
+                .padding(4.dp)
+                .background(Color.White)
         ) {
-            Row(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .weight(3.5f)
-                ) {
-                    Text(
-                        text = "Nome da Senha " + senha.nomeSenha,
-                        fontFamily = fontSora,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row() {
-                        Text(
-                            text = senha.valorSenha,
-                            fontFamily = fontSora,
-                            fontWeight = FontWeight.Normal,
-                            modifier = Modifier
-                                .border(1.5.dp, Color.LightGray, RoundedCornerShape(15))
-                                .padding(10.dp)
-                                .fillMaxWidth()
-                        )
-                    }
-                }
-                Column(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .fillMaxHeight()
-                        .padding(12.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    ElevatedButton(
-                        onClick = { mostrarDialogExclusao = true },
-                        shape = RoundedCornerShape(25),
-                        colors = ButtonDefaults.buttonColors(containerColor = AzulPrincipal),
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 10.dp,
+                    pressedElevation = 15.dp
+                )
+            ) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    Column(
                         modifier = Modifier
-                            .width(75.dp)
-                            .height(75.dp),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
+                            .padding(8.dp)
+                            .weight(3.5f)
                     ) {
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.delete_white_24dp),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize()
+                        Text(
+                            text = "Nome: " + senha.nomeSenha,
+                            fontFamily = fontSora,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row() {
+                            Text(
+                                text = senha.valorSenha,
+                                fontFamily = fontSora,
+                                fontWeight = FontWeight.Normal,
+                                modifier = Modifier
+                                    .border(1.5.dp, Color.LightGray, RoundedCornerShape(15))
+                                    .padding(10.dp)
+                                    .fillMaxWidth()
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+                    Column(
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .fillMaxHeight()
+                            .padding(12.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        ElevatedButton(
+                            onClick = { visivelExclusao = true },
+                            shape = RoundedCornerShape(25),
+                            colors = ButtonDefaults.buttonColors(containerColor = AzulPrincipal),
+                            modifier = Modifier
+                                .width(75.dp)
+                                .height(75.dp),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
+                        ) {
+                            Column(modifier = Modifier.fillMaxSize()) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.delete_white_24dp),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(2.dp))
             }
-            Spacer(modifier = Modifier.height(2.dp))
         }
     }
-
-    if(mostrarDialogExclusao){
-        mostrarDialogExclusao =
-            DialogExcluirSenha(
-            senhaDAO = senhaDAO,
-            senha = senha ,
-            mostrar = mostrarDialogExclusao)
+    if(visivelExclusao) {
+        excluirSenha = DialogExcluirSenha(true)
+        visivel = !excluirSenha
+        if(excluirSenha){
+            senhasAtualizadas.remove(senha)
+            senhaDAO.deleteSenhaById(senha.idSenha)
+        }
     }
+    return senhasAtualizadas
 }
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun DialogExcluirSenha(senhaDAO: SenhaDAO, senha: Senha, mostrar: Boolean): Boolean{
+fun DialogExcluirSenha(mostrar: Boolean): Boolean{
 
     var mostrarDialog by remember {
         mutableStateOf(mostrar)
     }
 
+    var excluir by remember {
+        mutableStateOf(false)
+    }
+
     if(mostrarDialog) {
         Dialog(
-            onDismissRequest = { mostrarDialog = false }) {
+            onDismissRequest = {
+            mostrarDialog = false }) {
             Card(
                 modifier = Modifier
                     .wrapContentSize(),
@@ -221,15 +234,13 @@ fun DialogExcluirSenha(senhaDAO: SenhaDAO, senha: Senha, mostrar: Boolean): Bool
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Row(
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(0.5f)
                             .padding(8.dp)
                             .height(50.dp),
                         horizontalArrangement = Arrangement.Start
                     ) {
                         ElevatedButton(
-                            onClick = {
-                                mostrarDialog = false
-                            },
+                            onClick = { mostrarDialog = false },
                             shape = RoundedCornerShape(20),
                             colors = ButtonDefaults.buttonColors(containerColor = VermelhoCancelar),
                             modifier = Modifier.fillMaxHeight()
@@ -243,17 +254,19 @@ fun DialogExcluirSenha(senhaDAO: SenhaDAO, senha: Senha, mostrar: Boolean): Bool
                     }
                     Row(
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(0.5f)
                             .padding(8.dp)
                             .height(50.dp),
                         horizontalArrangement = Arrangement.End
                     ) {
                         ElevatedButton(
-                            onClick = {senhaDAO.deleteSenhaById(senha.idSenha)
-                                      mostrarDialog  = false},
+                            onClick = {
+                                mostrarDialog = false
+                                excluir = true },
                             shape = RoundedCornerShape(20),
                             colors = ButtonDefaults.buttonColors(containerColor = AzulPrincipal),
-                            modifier = Modifier.fillMaxHeight()
+                            modifier = Modifier
+                                .fillMaxHeight()
                         ) {
                             Text(
                                 text = "Excluir",
@@ -270,7 +283,7 @@ fun DialogExcluirSenha(senhaDAO: SenhaDAO, senha: Senha, mostrar: Boolean): Bool
             }
         }
     }
-    return mostrarDialog
+    return excluir
 }
 
 @RequiresApi(Build.VERSION_CODES.P)

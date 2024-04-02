@@ -52,7 +52,7 @@ class DatabaseSenhas(context: Context?) :
     }
 
 
-    fun getTodasSenhas(): List<Senha> {
+    fun getTodasSenhas(): MutableList<Senha> {
         val senhas = mutableListOf<Senha>()
         val db = readableDatabase
         val cursor: Cursor = db.rawQuery("SELECT * FROM $TABLE_NAME", null)

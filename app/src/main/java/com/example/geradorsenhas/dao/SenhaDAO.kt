@@ -12,7 +12,7 @@ class SenhaDAO(context: Context): SenhaInterfaceDAO {
     @RequiresApi(Build.VERSION_CODES.P)
     private var database: DatabaseSenhas = DatabaseSenhas(context = context)
     @RequiresApi(Build.VERSION_CODES.P)
-    override fun getTodasSenhas(): List<Senha> {
+    override fun getTodasSenhas(): MutableList<Senha> {
         return database.getTodasSenhas();
     }
 
