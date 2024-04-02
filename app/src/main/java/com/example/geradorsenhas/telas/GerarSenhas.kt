@@ -66,6 +66,7 @@ import com.example.geradorsenhas.ui.theme.fontSora
 import com.example.geradorsenhas.vo.Senha
 import kotlin.random.Random
 
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -477,10 +478,16 @@ fun gerarSenha(context: Context, temEspeciais: Boolean, temNumeros: Boolean, qua
     var quantidadeEspeciais = 0
     var quantidadeNumeros = 0
     var quantidadeLetras = 0
+
     if(quantidadeTotal < 6){
         mensagemInformativa = "A senha deve conter no mínimo 6 caracteres"
         Toast.makeText(context,mensagemInformativa, Toast.LENGTH_LONG).show()
-    }else{
+    } else if(quantidadeTotal > 20){
+        mensagemInformativa = "A senha deve conter no máximo 20 caracteres"
+        Toast.makeText(context,mensagemInformativa, Toast.LENGTH_LONG).show()
+    }
+
+    else{
 
         if(temEspeciais && temNumeros){
             quantidadeLetras = quantidadeTotal.div(3)

@@ -1,7 +1,12 @@
 package com.example.geradorsenhas.telas
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,10 +30,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -95,6 +103,8 @@ fun SenhasSalvas(){
 @Composable
 fun CardSenhaSalva(senha: Senha, senhas: MutableList<Senha>): List<Senha>{
 
+    val contexto = LocalContext.current
+
     var excluirSenha by remember {
         mutableStateOf(false)
     }
@@ -109,6 +119,34 @@ fun CardSenhaSalva(senha: Senha, senhas: MutableList<Senha>): List<Senha>{
 
     var senhasAtualizadas by remember {
         mutableStateOf(senhas)
+    }
+
+    var senhaVisivel by remember {
+        mutableStateOf(false)
+    }
+
+    val iconeVisivel by remember {
+        mutableIntStateOf(R.drawable.view_on_keys)
+    }
+    val iconeInvisivel by remember {
+        mutableIntStateOf(R.drawable.view_off_keys)
+    }
+
+    val valorSenhaVisivel by remember {
+        mutableStateOf(senha.valorSenha)
+    }
+
+    val valorSenhaMask by remember {
+        var tamanho = senha.valorSenha.length
+        var valorMask = "*"
+        for(i in 0 until tamanho){
+            valorMask += "*"
+        }
+        mutableStateOf(valorMask)
+    }
+
+    var valorSenha by remember {
+        mutableStateOf(valorSenhaMask)
     }
 
     val context = LocalContext.current
@@ -141,23 +179,47 @@ fun CardSenhaSalva(senha: Senha, senhas: MutableList<Senha>): List<Senha>{
                             fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Row() {
+                        Row(modifier = Modifier.border(1.5.dp, Color.LightGray, RoundedCornerShape(15))) {
                             Text(
-                                text = senha.valorSenha,
+                                text = valorSenha,
                                 fontFamily = fontSora,
-                                fontWeight = FontWeight.Normal,
+                                fontWeight = FontWeight.ExtraBold,
                                 modifier = Modifier
-                                    .border(1.5.dp, Color.LightGray, RoundedCornerShape(15))
-                                    .padding(10.dp)
-                                    .fillMaxWidth()
+                                    .padding(12.dp)
+                                    .fillMaxSize()
+                                    .weight(1f)
                             )
+                            IconButton(onClick = {
+                                if(senhaVisivel){
+                                    senhaVisivel = false
+                                    valorSenha = valorSenhaMask
+                                }else {
+                                    senhaVisivel = true
+                                    valorSenha = valorSenhaVisivel
+                                }
+                            }) {
+                                if(senhaVisivel) {
+                                    Icon(
+                                        painter = painterResource(iconeVisivel),
+                                        contentDescription = null
+                                    )
+                                }else {
+                                    Icon(
+                                        painter = painterResource(iconeInvisivel),
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+                            IconButton(onClick = { copiarSenha(contexto,valorSenhaVisivel) }) {
+                                Icon(painter = painterResource(id = R.drawable.copy), contentDescription =  null)
+                            }
                         }
                     }
                     Column(
                         modifier = Modifier
-                            .wrapContentWidth()
+                            .width(85.dp)
                             .fillMaxHeight()
-                            .padding(12.dp),
+                            .padding(top = 10.dp, bottom = 10.dp, end = 6.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -166,8 +228,7 @@ fun CardSenhaSalva(senha: Senha, senhas: MutableList<Senha>): List<Senha>{
                             shape = RoundedCornerShape(25),
                             colors = ButtonDefaults.buttonColors(containerColor = AzulPrincipal),
                             modifier = Modifier
-                                .width(75.dp)
-                                .height(75.dp),
+                                .width(70.dp),
                             elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
                         ) {
                             Column(modifier = Modifier.fillMaxSize()) {
@@ -195,6 +256,14 @@ fun CardSenhaSalva(senha: Senha, senhas: MutableList<Senha>): List<Senha>{
     }
     return senhasAtualizadas
 }
+
+fun copiarSenha(context: Context, senhaGerada: String){
+    val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("Senha gerada", senhaGerada)
+    clipboardManager.setPrimaryClip(clip)
+    Toast.makeText(context,"Senha copiada para a Área de Transferência", Toast.LENGTH_SHORT).show()
+}
+
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun DialogExcluirSenha(mostrar: Boolean): Boolean{
@@ -240,7 +309,8 @@ fun DialogExcluirSenha(mostrar: Boolean): Boolean{
                         horizontalArrangement = Arrangement.Start
                     ) {
                         ElevatedButton(
-                            onClick = { mostrarDialog = false },
+                            onClick = { mostrarDialog = false
+                                      excluir =  false},
                             shape = RoundedCornerShape(20),
                             colors = ButtonDefaults.buttonColors(containerColor = VermelhoCancelar),
                             modifier = Modifier.fillMaxHeight()
@@ -291,8 +361,7 @@ fun DialogExcluirSenha(mostrar: Boolean): Boolean{
 @Preview
 fun PreviewSenhasSalvas(){
     GeradorSenhasTheme {
-//        CardSenhaSalva("Facebook","*******")
-        SenhasSalvas()
-//        DialogExcluirSenha()
+        CardSenhaSalva(Senha(1,"Facebook","******"), mutableListOf())
+//        SenhasSalvas()
     }
 }
