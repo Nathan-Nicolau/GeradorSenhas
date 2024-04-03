@@ -105,10 +105,6 @@ fun CardSenhaSalva(senha: Senha, senhas: MutableList<Senha>): List<Senha>{
 
     val contexto = LocalContext.current
 
-    var excluirSenha by remember {
-        mutableStateOf(false)
-    }
-
     var visivelExclusao by remember {
         mutableStateOf(false)
     }
@@ -247,12 +243,9 @@ fun CardSenhaSalva(senha: Senha, senhas: MutableList<Senha>): List<Senha>{
         }
     }
     if(visivelExclusao) {
-        excluirSenha = DialogExcluirSenha(true)
-        visivel = !excluirSenha
-        if(excluirSenha){
-            senhasAtualizadas.remove(senha)
-            senhaDAO.deleteSenhaById(senha.idSenha)
-        }
+        senhasAtualizadas.remove(senha)
+        senhaDAO.deleteSenhaById(senha.idSenha)
+        visivel = false
     }
     return senhasAtualizadas
 }

@@ -28,6 +28,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ElevatedButton
@@ -112,7 +113,6 @@ fun GerarSenhas(){
                     color = AzulPrincipal,
                     modifier = Modifier.padding(8.dp)
                 )
-
                 Image(painter = painterResource(id = R.drawable.lock), contentDescription = null)
             }
 
@@ -120,22 +120,21 @@ fun GerarSenhas(){
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(top = 35.dp)){
+                .padding(top = 35.dp))
+            {
                 Column(modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)) {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .border(2.5.dp, Color.LightGray, RoundedCornerShape(8))
-                            .padding(8.dp)){
+                    Card(
+                        Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 20.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)){
                         Row (modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 6.dp),
+                            .padding(start = 12.dp, top = 6.dp, bottom = 6.dp),
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.CenterVertically){
                             Text(text = "Caracteres Especiais ?",
-                                modifier = Modifier.padding(end = 4.dp),
                                 fontFamily = fontSora, fontWeight = FontWeight.SemiBold,
                                 color = Color.Black)
                             Checkbox(checked = caracteresEspeciais,
@@ -146,11 +145,10 @@ fun GerarSenhas(){
                         }
                         Row(modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 6.dp),
+                            .padding(start = 12.dp, bottom = 6.dp),
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.CenterVertically){
                             Text(text = "Com números ?",
-                                modifier = Modifier.padding(end = 4.dp),
                                 fontFamily = fontSora, fontWeight = FontWeight.SemiBold,
                                 color = Color.Black)
                             Checkbox(checked = comNumeros,
@@ -161,7 +159,7 @@ fun GerarSenhas(){
                         }
                         Row(modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp, start = 8.dp, end = 8.dp),
+                            .padding(start = 8.dp, bottom = 8.dp, end = 8.dp),
                             horizontalArrangement = Arrangement.Start){
                             OutlinedTextField(
                                 value = qtdCaracteres ?: "",
@@ -183,18 +181,19 @@ fun GerarSenhas(){
                                 placeholder = { Text(text = "6", color = Color.LightGray, fontSize = 12.sp, fontFamily = fontSora, fontWeight = FontWeight.SemiBold) },
                                 colors = TextFieldDefaults.outlinedTextFieldColors(
                                     focusedBorderColor = AzulPrincipal,
-                                    unfocusedBorderColor = Color.LightGray),
+                                    unfocusedBorderColor = Color.LightGray,),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                             )
                         }
                     }
                     //Coluna pai do botão
-                    Column(
+                    Card(
                         Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
-                            .padding(top = 16.dp)
-                            .border(2.5.dp, Color.LightGray, RoundedCornerShape(10))){
+                            .padding(top = 16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 20.dp)){
                         Box(modifier = Modifier
                             .wrapContentHeight()
                             .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 10.dp)){
@@ -214,7 +213,7 @@ fun GerarSenhas(){
                                         )},
                                         shape = RoundedCornerShape(20),
                                         colors = ButtonDefaults.buttonColors(Color.Blue),
-                                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
+                                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 20.dp),
                                         modifier = Modifier
                                             .height(70.dp)
                                             .wrapContentWidth()
@@ -275,14 +274,13 @@ fun GerarSenhas(){
                                                     .fillMaxHeight()
                                                     .wrapContentWidth()
                                             ){
-                                                Button(
+                                                IconButton(
                                                     modifier = Modifier.wrapContentWidth(align = Alignment.End),
                                                     onClick = { showDialogSalvar = true
                                                         copiarSenhaAreaTransferencia(
                                                             context = contextAplicacao,
                                                             senhaGerada = senhaFinalGerada
-                                                        )},
-                                                    colors = ButtonDefaults.buttonColors(Color.White),
+                                                        )}
                                                 ) {
                                                     Image(painter = painterResource(id = R.drawable.copy),
                                                         contentDescription = null)
@@ -293,6 +291,16 @@ fun GerarSenhas(){
                                 }
                             }
                         }
+                    }
+                    Column(modifier = Modifier
+                        .fillMaxWidth().padding(top = 20.dp)
+                        .height(200.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(
+                            modifier = Modifier.fillMaxSize(),
+                            painter = painterResource(id = R.drawable.imagem_pessoa_chave),
+                            contentDescription = null)
                     }
                 }
             }
@@ -318,10 +326,6 @@ fun dialogSalvarSenha(senhaGerada: String, show: Boolean, context: Context): Boo
 
     var mostrar by remember {
         mutableStateOf(show)
-    }
-
-    var senhaCriada by remember {
-        mutableStateOf("")
     }
 
     var senhaDAO =  SenhaDAO(context)
@@ -572,10 +576,11 @@ fun copiarSenhaAreaTransferencia(context: Context, senhaGerada: String){
     Toast.makeText(context,"Senha copiada para a Área de Transferência", Toast.LENGTH_SHORT).show()
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 @Preview
 fun GerarSenhasPreview(){
     GeradorSenhasTheme {
-//        GerarSenhas()
+        GerarSenhas()
     }
 }
