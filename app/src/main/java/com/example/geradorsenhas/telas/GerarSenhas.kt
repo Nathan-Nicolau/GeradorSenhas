@@ -33,6 +33,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -105,22 +106,28 @@ fun GerarSenhas(){
         Box(modifier = Modifier
             .fillMaxWidth()
         ){
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Gerador de Senhas",
-                    fontFamily = fontSora,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = AzulPrincipal,
-                    modifier = Modifier.padding(8.dp)
-                )
-                Image(painter = painterResource(id = R.drawable.lock), contentDescription = null)
+            Card(modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                Row(verticalAlignment = Alignment.CenterVertically){
+                    Text(
+                        text = "Gerador de Senhas",
+                        fontFamily = fontSora,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp,
+                        color = AzulPrincipal,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(top = 35.dp))
+                .padding(top = 50.dp))
             {
                 Column(modifier = Modifier
                     .fillMaxWidth()
@@ -293,7 +300,8 @@ fun GerarSenhas(){
                         }
                     }
                     Column(modifier = Modifier
-                        .fillMaxWidth().padding(top = 20.dp)
+                        .fillMaxWidth()
+                        .padding(top = 20.dp)
                         .height(200.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally) {
