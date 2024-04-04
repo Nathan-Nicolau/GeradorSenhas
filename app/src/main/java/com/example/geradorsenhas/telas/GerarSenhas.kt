@@ -43,6 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -92,9 +93,36 @@ fun GerarSenhas(){
         mutableStateOf("")
     }
 
-
     var showDialogSalvar by remember {
         mutableStateOf(false)
+    }
+
+    val iconeVisivel by remember {
+        mutableIntStateOf(R.drawable.view_on_keys)
+    }
+    val iconeInvisivel by remember {
+        mutableIntStateOf(R.drawable.view_off_keys)
+    }
+
+    var senhaVisivel by remember {
+        mutableStateOf(false)
+    }
+
+    var valorSenhaVisivel by remember {
+        mutableStateOf(senhaFinalGerada)
+    }
+
+    var valorSenhaMask by remember {
+        var tamanho = senhaFinalGerada.length
+        var valorMask = ""
+        for(i in 0 until tamanho){
+            valorMask += "*"
+        }
+        mutableStateOf(valorMask)
+    }
+
+    var valorSenha by remember {
+        mutableStateOf(valorSenhaMask)
     }
 
 
@@ -212,21 +240,34 @@ fun GerarSenhas(){
                                 Row(modifier = Modifier.wrapContentHeight(),
                                     verticalAlignment = Alignment.Bottom) {
                                     ElevatedButton(
-                                        onClick = {senhaFinalGerada = gerarSenha(
+                                        onClick = { senhaFinalGerada = gerarSenha(
                                             context = contextAplicacao,
                                             temEspeciais = caracteresEspeciais,
                                             temNumeros = comNumeros,
                                             quantidade = qtdCaracteres ?: "6"
-                                        )},
-                                        shape = RoundedCornerShape(20),
+                                        )
+                                            var tamanho = senhaFinalGerada.length
+                                            var valorMask = ""
+                                            for(i in 0 until tamanho){
+                                                valorMask += "*"
+                                            }
+                                            valorSenhaMask = valorMask
+                                            valorSenhaVisivel = senhaFinalGerada
+
+                                            if(senhaVisivel){
+                                                valorSenha = valorSenhaVisivel
+                                            }else {
+                                                valorSenha = valorSenhaMask
+                                            }},
+                                        shape = RoundedCornerShape(24),
                                         colors = ButtonDefaults.buttonColors(Color.Blue),
-                                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 20.dp),
+                                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 25.dp, pressedElevation = 10.dp),
                                         modifier = Modifier
                                             .height(70.dp)
-                                            .wrapContentWidth()
+                                            .width(90.dp)
                                     )
                                     {
-                                        Row() {
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                             Text(
                                                 text = "Gerar",
                                                 fontFamily = fontSora,
@@ -267,7 +308,7 @@ fun GerarSenhas(){
                                                     .fillMaxWidth()
                                                     .weight(2f)) {
                                                 Text(
-                                                    text = senhaFinalGerada,
+                                                    text = valorSenha,
                                                     fontFamily = fontSora,
                                                     fontWeight = FontWeight.SemiBold,
                                                     color = AzulPrincipal
@@ -275,21 +316,43 @@ fun GerarSenhas(){
                                             }
                                             Spacer(modifier = Modifier.width(4.dp))
 
-                                            Column(verticalArrangement = Arrangement.Center,
-                                                horizontalAlignment = Alignment.End,
-                                                modifier = Modifier
-                                                    .fillMaxHeight()
-                                                    .wrapContentWidth()
+                                            Row(modifier = Modifier
+                                                .fillMaxHeight()
+                                                .wrapContentWidth()
                                             ){
                                                 IconButton(
+                                                    modifier = Modifier.width(30.dp),
+                                                    onClick = {
+                                                        if(senhaVisivel){
+                                                            senhaVisivel = false
+                                                            valorSenha = valorSenhaMask
+                                                        }else {
+                                                            senhaVisivel = true
+                                                            valorSenha = valorSenhaVisivel
+                                                        }
+                                                    }) {
+                                                    if(senhaVisivel){
+                                                        Icon(painter = painterResource(id = iconeVisivel), contentDescription = null)
+                                                    }else{
+                                                        Icon(painter = painterResource(id = iconeInvisivel), contentDescription = null )
+                                                    }
+                                                }
+                                                IconButton(
                                                     modifier = Modifier.wrapContentWidth(align = Alignment.End),
-                                                    onClick = { showDialogSalvar = true
-                                                        copiarSenhaAreaTransferencia(
-                                                            context = contextAplicacao,
-                                                            senhaGerada = senhaFinalGerada
-                                                        )}
+                                                    onClick =
+                                                    {
+                                                        if(senhaFinalGerada.isNotBlank()){
+                                                            showDialogSalvar = true
+                                                            copiarSenhaAreaTransferencia(
+                                                                context = contextAplicacao,
+                                                                senhaGerada = senhaFinalGerada)
+                                                        }else {
+                                                            toastSenhaPendente(context = contextAplicacao)
+                                                        }
+                                                    }
+
                                                 ) {
-                                                    Image(painter = painterResource(id = R.drawable.copy),
+                                                    Icon(painter = painterResource(id = R.drawable.copy),
                                                         contentDescription = null)
                                                 }
                                             }
@@ -406,8 +469,8 @@ fun dialogSalvarSenha(senhaGerada: String, show: Boolean, context: Context): Boo
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = senhaGerada,
-                        fontWeight = FontWeight.SemiBold,
+                        text = "Valor: $senhaGerada",
+                        fontWeight = FontWeight.Bold,
                         fontFamily = fontSora, color = Color.Black,
                         modifier = Modifier
                             .border(2.dp, Color.LightGray, RoundedCornerShape(20))
@@ -477,10 +540,18 @@ fun toastSenhaSalva(context: Context){
     Toast.makeText(context,"Senha salva com sucesso!", Toast.LENGTH_SHORT).show()
 }
 
+fun toastSenhaPendente(context: Context){
+    Toast.makeText(context,"Sem senha gerada para salvar...", Toast.LENGTH_SHORT).show()
+}
+
 fun gerarSenha(context: Context, temEspeciais: Boolean, temNumeros: Boolean, quantidade: String): String{
 
-    var mensagemInformativa: String
-    var quantidadeTotal = quantidade.toInt()
+    val mensagemInformativa: String
+    var quantidadeAjustada = quantidade
+    if(quantidadeAjustada.isEmpty()){
+        quantidadeAjustada = "6"
+    }
+    val quantidadeTotal = quantidadeAjustada.toInt()
     var senhaGerada = ""
     var quantidadeTotalAuxiliar = quantidadeTotal
     val especiais = "!()@#$%&*_"

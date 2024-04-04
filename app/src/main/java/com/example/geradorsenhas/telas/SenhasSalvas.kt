@@ -85,6 +85,7 @@ fun SenhasSalvas(){
                 .background(Color.White)) {
                 senhas.forEach {
                     temSenhas = CardSenhaSalva(it, senhas).isNotEmpty()
+                    temSenhas = senhaDAO.getTodasSenhas().isNotEmpty()
                 }
             }
         }else{
@@ -225,7 +226,7 @@ fun CardSenhaSalva(senha: Senha, senhas: MutableList<Senha>): List<Senha>{
                             colors = ButtonDefaults.buttonColors(containerColor = AzulPrincipal),
                             modifier = Modifier
                                 .width(70.dp),
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 25.dp, pressedElevation = 10.dp),
                         ) {
                             Column(modifier = Modifier.fillMaxSize()) {
                                 Icon(
@@ -243,7 +244,7 @@ fun CardSenhaSalva(senha: Senha, senhas: MutableList<Senha>): List<Senha>{
         }
     }
     if(visivelExclusao) {
-        senhasAtualizadas.remove(senha)
+//        senhasAtualizadas.remove(senha)
         senhaDAO.deleteSenhaById(senha.idSenha)
         visivel = false
     }
