@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -61,7 +60,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.geradorsenhas.R
 import com.example.geradorsenhas.dao.SenhaDAO
-import com.example.geradorsenhas.db.DatabaseSenhas
 import com.example.geradorsenhas.ui.theme.AzulPrincipal
 import com.example.geradorsenhas.ui.theme.GeradorSenhasTheme
 import com.example.geradorsenhas.ui.theme.VermelhoCancelar
@@ -378,7 +376,7 @@ fun GerarSenhas(){
         }
     }
     if(showDialogSalvar) {
-        showDialogSalvar = dialogSalvarSenha(
+        showDialogSalvar = DialogSalvarSenha(
             senhaGerada = senhaFinalGerada,
             show = showDialogSalvar,
             contextAplicacao,
@@ -390,7 +388,8 @@ fun GerarSenhas(){
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun dialogSalvarSenha(senhaGerada: String, show: Boolean, context: Context): Boolean{
+fun DialogSalvarSenha(senhaGerada: String, show: Boolean, context: Context): Boolean{
+
     var nomeNovaSenha by remember {
         mutableStateOf("")
     }
@@ -399,13 +398,43 @@ fun dialogSalvarSenha(senhaGerada: String, show: Boolean, context: Context): Boo
         mutableStateOf(show)
     }
 
+    var senhaVisivel by remember {
+        mutableStateOf(false)
+    }
+
+    val iconeVisivel by remember {
+        mutableIntStateOf(R.drawable.view_on_keys)
+    }
+
+    val iconeInvisivel by remember {
+        mutableIntStateOf(R.drawable.view_off_keys)
+    }
+
+    var valorSenhaVisivel by remember {
+        mutableStateOf(senhaGerada)
+    }
+
+    var valorSenhaMask by remember {
+        var tamanho = senhaGerada.length
+        var valorMask = ""
+        for(i in 0 until tamanho){
+            valorMask += "*"
+        }
+        mutableStateOf(valorMask)
+    }
+
+    var valorSenha by remember {
+        mutableStateOf(valorSenhaMask)
+    }
+
     var senhaDAO =  SenhaDAO(context)
     var novoIdSenha = senhaDAO.getNovoId()
 
 
     if(mostrar) {
         Dialog(onDismissRequest = { mostrar = false }) {
-            Card(shape = RoundedCornerShape(5)) {
+            Card(shape = RoundedCornerShape(5),
+                elevation = CardDefaults.cardElevation(defaultElevation = 20.dp)) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -456,7 +485,7 @@ fun dialogSalvarSenha(senhaGerada: String, show: Boolean, context: Context): Boo
                             },
                             placeholder = {
                                 Text(
-                                    text = "6",
+                                    text = "Nova Senha",
                                     color = Color.LightGray,
                                     fontSize = 12.sp,
                                     fontFamily = fontSora,
@@ -468,15 +497,33 @@ fun dialogSalvarSenha(senhaGerada: String, show: Boolean, context: Context): Boo
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Valor: $senhaGerada",
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = fontSora, color = Color.Black,
-                        modifier = Modifier
-                            .border(2.dp, Color.LightGray, RoundedCornerShape(20))
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    )
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .border(2.5.dp, Color.LightGray, RoundedCornerShape(20)).height(50.dp),
+                        verticalAlignment = Alignment.CenterVertically){
+                            Text(text = "Senha: $valorSenha",
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = fontSora, color = Color.Black,
+                                modifier = Modifier
+                                    .padding(start = 8.dp)
+                                    .weight(3f))
+                        IconButton(onClick = {
+                            if(senhaVisivel){
+                                senhaVisivel = false
+                                valorSenha = valorSenhaMask
+                            }else {
+                                senhaVisivel = true
+                                valorSenha = valorSenhaVisivel
+                            }
+                        }, modifier = Modifier
+                            .weight(0.5f)
+                            .wrapContentWidth()) {
+                            if(senhaVisivel){
+                                Icon(painter = painterResource(id = iconeVisivel), contentDescription = null)
+                            }else {
+                                Icon(painter = painterResource(id = iconeInvisivel), contentDescription = null)
+                            } }
+                    }
 
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(modifier = Modifier.fillMaxWidth()) {
@@ -660,6 +707,7 @@ fun copiarSenhaAreaTransferencia(context: Context, senhaGerada: String){
 @Preview
 fun GerarSenhasPreview(){
     GeradorSenhasTheme {
-        GerarSenhas()
+//        GerarSenhas()
+        DialogSalvarSenha(senhaGerada = "*******", show = true, context = LocalContext.current)
     }
 }

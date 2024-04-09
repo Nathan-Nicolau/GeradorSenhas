@@ -8,8 +8,13 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.OverscrollEffect
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,9 +26,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.overscroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,6 +44,7 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -81,8 +95,10 @@ fun SenhasSalvas(){
         if(temSenhas) {
             Spacer(modifier = Modifier.height(4.dp))
             Column(modifier = Modifier
+                .verticalScroll(ScrollState(0))
                 .fillMaxSize()
-                .background(Color.White)) {
+                .background(Color.White)
+                .padding(bottom = 85.dp)) {
                 senhas.forEach {
                     temSenhas = CardSenhaSalva(it, senhas).isNotEmpty()
                     temSenhas = senhaDAO.getTodasSenhas().isNotEmpty()
@@ -155,7 +171,7 @@ fun CardSenhaSalva(senha: Senha, senhas: MutableList<Senha>): List<Senha>{
                 .height(100.dp)
                 .fillMaxWidth()
                 .padding(4.dp)
-                .background(Color.White)
+                .background(Color.White, RoundedCornerShape(20))
         ) {
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
