@@ -85,7 +85,7 @@ fun AppNavigation( ){
 }
 
 //fun inicializarBancoDeDados(){
-//
+// teste
 //}
 @Composable
 @Preview
