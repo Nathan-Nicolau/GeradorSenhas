@@ -84,9 +84,9 @@ fun AppNavigation( ){
     }
 }
 
-fun inicializarBancoDeDados(){
-
-}
+//fun inicializarBancoDeDados(){
+//
+//}
 @Composable
 @Preview
 fun previewBarNavigation(){
