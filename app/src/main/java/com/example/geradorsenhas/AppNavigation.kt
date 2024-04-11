@@ -85,7 +85,9 @@ fun AppNavigation( ){
 }
 
 //fun inicializarBancoDeDados(){
-// teste
+fun testMerge(){
+    var teste = "OK"
+}
 //}
 @Composable
 @Preview
