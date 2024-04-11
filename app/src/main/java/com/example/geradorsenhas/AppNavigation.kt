@@ -85,11 +85,8 @@ fun AppNavigation( ){
 }
 
 //fun inicializarBancoDeDados(){
-fun testeMerge(){
-    var teste = "teste"
-    if(teste.isNotBlank()){
-        teste = "OK"
-    }
+fun testMerge(){
+    var teste = "OK"
 }
 //}
 @Composable
