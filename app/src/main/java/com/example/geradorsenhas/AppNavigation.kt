@@ -57,12 +57,8 @@ fun AppNavigation( ){
 
                                     }
                         },
-                        icon = {
-                               Icon(painter = painterResource(id = itemNavegacao.idIcone), contentDescription = null )
-                        },
-                        label = {
-                            Text(text = itemNavegacao.nomeIcone)
-                        },
+                        icon = { Icon(painter = painterResource(id = itemNavegacao.idIcone), contentDescription = null ) },
+                        label = { Text(text = itemNavegacao.nomeIcone) },
                         colors = NavigationBarItemDefaults.colors(
                             unselectedIconColor = Color.Black,
                             selectedIconColor = AzulPrincipal,

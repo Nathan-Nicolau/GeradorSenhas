@@ -75,14 +75,17 @@ fun GerarSenhas(){
 
     var contextAplicacao = LocalContext.current
 
+    //Opção para ter caracteres especiais
     var caracteresEspeciais by remember {
         mutableStateOf(false)
     }
 
+    //Opção para ter números
     var comNumeros by remember {
         mutableStateOf(false)
     }
 
+    //Quantidade total de caracteres
     var qtdCaracteres:String? by remember {
         mutableStateOf(null)
     }
@@ -123,15 +126,13 @@ fun GerarSenhas(){
         mutableStateOf(valorSenhaMask)
     }
 
-
+    //Construção do Scaffold base
     Scaffold(
         containerColor = Color.White,
         modifier = Modifier
-            .fillMaxSize(),
-    ) {
+            .fillMaxSize()) {
         Box(modifier = Modifier
-            .fillMaxWidth()
-        ){
+            .fillMaxWidth()) {
             Card(modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
@@ -153,47 +154,43 @@ fun GerarSenhas(){
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(top = 50.dp))
-            {
+                .padding(top = 50.dp)) {
                 Column(modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)) {
-                    Card(
-                        Modifier.fillMaxWidth(),
+                    Card(Modifier.fillMaxWidth(),
                         elevation = CardDefaults.cardElevation(defaultElevation = 20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White)){
+                        colors = CardDefaults.cardColors(containerColor = Color.White)) {
                         Row (modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 12.dp, top = 6.dp, bottom = 6.dp),
                             horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically){
+                            verticalAlignment = Alignment.CenterVertically) {
+
                             Text(text = "Caracteres Especiais ?",
                                 fontFamily = fontSora, fontWeight = FontWeight.SemiBold,
                                 color = Color.Black)
                             Checkbox(checked = caracteresEspeciais,
                                 onCheckedChange = {isChecked:Boolean -> caracteresEspeciais = isChecked},
-                                modifier = Modifier
-                                    .background(Color.White, RoundedCornerShape(15)),
+                                modifier = Modifier.background(Color.White, RoundedCornerShape(15)),
                                 colors = CheckboxDefaults.colors(checkedColor = Color.Blue, uncheckedColor = Color.LightGray))
                         }
                         Row(modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 12.dp, bottom = 6.dp),
                             horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically){
+                            verticalAlignment = Alignment.CenterVertically) {
                             Text(text = "Com números ?",
                                 fontFamily = fontSora, fontWeight = FontWeight.SemiBold,
                                 color = Color.Black)
                             Checkbox(checked = comNumeros,
                                 onCheckedChange = {isChecked:Boolean -> comNumeros = isChecked},
-                                modifier = Modifier
-                                    .background(Color.White, RoundedCornerShape(15)),
-                                colors = CheckboxDefaults.colors(checkedColor = Color.Blue, uncheckedColor = Color.LightGray, checkmarkColor = Color.White))
-                        }
+                                modifier = Modifier.background(Color.White, RoundedCornerShape(15)),
+                                colors = CheckboxDefaults.colors(checkedColor = Color.Blue, uncheckedColor = Color.LightGray, checkmarkColor = Color.White)) }
                         Row(modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 8.dp, bottom = 8.dp, end = 8.dp),
-                            horizontalArrangement = Arrangement.Start){
+                            horizontalArrangement = Arrangement.Start) {
                             OutlinedTextField(
                                 value = qtdCaracteres ?: "",
                                 onValueChange = {qtdNova -> qtdCaracteres = qtdNova},
@@ -203,14 +200,11 @@ fun GerarSenhas(){
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = AzulPrincipal
-                                )
-                                },
+                                )},
                                 textStyle = TextStyle.Default,
                                 maxLines = 1,
                                 shape = RoundedCornerShape(20),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(60.dp),
+                                modifier = Modifier.fillMaxWidth().height(60.dp),
                                 placeholder = { Text(text = "6", color = Color.LightGray, fontSize = 12.sp, fontFamily = fontSora, fontWeight = FontWeight.SemiBold) },
                                 colors = TextFieldDefaults.outlinedTextFieldColors(
                                     focusedBorderColor = AzulPrincipal,
@@ -220,39 +214,37 @@ fun GerarSenhas(){
                         }
                     }
                     //Coluna pai do botão
-                    Card(
-                        Modifier
+                    Card(Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
                             .padding(top = 16.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 20.dp)){
+                        elevation = CardDefaults.cardElevation(defaultElevation = 20.dp)) {
                         Box(modifier = Modifier
                             .wrapContentHeight()
-                            .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 10.dp)){
-                            Column(modifier = Modifier.wrapContentHeight()){
+                            .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 10.dp)) {
+                            Column(modifier = Modifier.wrapContentHeight()) {
                                 Text(text = "Gere sua senha com o botão abaixo",
                                     fontFamily = fontSora, fontWeight = FontWeight.SemiBold,
                                     modifier = Modifier.fillMaxWidth())
-
                                 Row(modifier = Modifier.wrapContentHeight(),
                                     verticalAlignment = Alignment.Bottom) {
                                     ElevatedButton(
-                                        onClick = { senhaFinalGerada = gerarSenha(
+                                        onClick = {senhaFinalGerada = gerarSenha(
                                             context = contextAplicacao,
                                             temEspeciais = caracteresEspeciais,
                                             temNumeros = comNumeros,
-                                            quantidade = qtdCaracteres ?: "6"
-                                        )
+                                            quantidade = qtdCaracteres ?: "6")
+
                                             var tamanho = senhaFinalGerada.length
                                             var valorMask = ""
-                                            for(i in 0 until tamanho){
+                                            for(i in 0 until tamanho) {
                                                 valorMask += "*"
                                             }
                                             valorSenhaMask = valorMask
                                             valorSenhaVisivel = senhaFinalGerada
 
-                                            if(senhaVisivel){
+                                            if(senhaVisivel) {
                                                 valorSenha = valorSenhaVisivel
                                             }else {
                                                 valorSenha = valorSenhaMask
@@ -260,18 +252,13 @@ fun GerarSenhas(){
                                         shape = RoundedCornerShape(24),
                                         colors = ButtonDefaults.buttonColors(Color.Blue),
                                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 25.dp, pressedElevation = 10.dp),
-                                        modifier = Modifier
-                                            .height(70.dp)
-                                            .width(90.dp)
-                                    )
-                                    {
+                                        modifier = Modifier.height(70.dp).width(90.dp)) {
                                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                             Text(
                                                 text = "Gerar",
                                                 fontFamily = fontSora,
                                                 fontWeight = FontWeight.ExtraBold
                                             )
-
                                             Spacer(modifier = Modifier.width(8.dp))
                                             Image(painter = painterResource(id = R.drawable.password),
                                                 contentDescription = null,)
@@ -279,7 +266,7 @@ fun GerarSenhas(){
                                     }
                                     Spacer(modifier = Modifier.width(6.dp))
 
-                                    Column(modifier = Modifier.wrapContentHeight()){
+                                    Column(modifier = Modifier.wrapContentHeight()) {
                                         Text(text = "Senha gerada ",
                                             fontFamily = fontSora,
                                             fontWeight = FontWeight.Normal,
@@ -287,14 +274,12 @@ fun GerarSenhas(){
 
                                         Spacer(modifier = Modifier.height(8.dp))
 
-                                        Row(modifier = Modifier
-                                            .height(50.dp)
+                                        Row(modifier = Modifier.height(50.dp)
                                             .border(
                                                 2.5.dp,
                                                 Color.LightGray,
                                                 RoundedCornerShape(20)
-                                            )
-                                            .fillMaxWidth()
+                                            ).fillMaxWidth()
                                             .padding(4.dp),
                                             horizontalArrangement = Arrangement.End)
                                         {
@@ -316,8 +301,7 @@ fun GerarSenhas(){
 
                                             Row(modifier = Modifier
                                                 .fillMaxHeight()
-                                                .wrapContentWidth()
-                                            ){
+                                                .wrapContentWidth()) {
                                                 IconButton(
                                                     modifier = Modifier.width(30.dp),
                                                     onClick = {
@@ -378,11 +362,10 @@ fun GerarSenhas(){
     if(showDialogSalvar) {
         showDialogSalvar = DialogSalvarSenha(
             senhaGerada = senhaFinalGerada,
-            show = showDialogSalvar,
+            show = true,
             contextAplicacao,
         )
     }
-
 }
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -601,13 +584,13 @@ fun gerarSenha(context: Context, temEspeciais: Boolean, temNumeros: Boolean, qua
     val quantidadeTotal = quantidadeAjustada.toInt()
     var senhaGerada = ""
     var quantidadeTotalAuxiliar = quantidadeTotal
-    val especiais = "!()@#$%&*_"
+    val especiais = "!?()@#$%&*_¨<>:;/|"
     val numeros = "0123456789"
     val letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
     var quantidadeEspeciais = 0
     var quantidadeNumeros = 0
-    var quantidadeLetras = 0
+    var quantidadeLetras:Int
 
     if(quantidadeTotal < 6){
         mensagemInformativa = "A senha deve conter no mínimo 6 caracteres"
@@ -618,7 +601,6 @@ fun gerarSenha(context: Context, temEspeciais: Boolean, temNumeros: Boolean, qua
     }
 
     else{
-
         if(temEspeciais && temNumeros){
             quantidadeLetras = quantidadeTotal.div(3)
             quantidadeTotalAuxiliar -= quantidadeLetras
@@ -653,7 +635,6 @@ fun gerarSenha(context: Context, temEspeciais: Boolean, temNumeros: Boolean, qua
         else {
             quantidadeLetras = quantidadeTotal
         }
-
 
         var numerosSenha = ""
         var especiaisSenha = ""
