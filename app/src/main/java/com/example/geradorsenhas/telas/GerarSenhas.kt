@@ -688,7 +688,6 @@ fun copiarSenhaAreaTransferencia(context: Context, senhaGerada: String){
 @Preview
 fun GerarSenhasPreview(){
     GeradorSenhasTheme {
-//        GerarSenhas()
         DialogSalvarSenha(senhaGerada = "*******", show = true, context = LocalContext.current)
     }
 }

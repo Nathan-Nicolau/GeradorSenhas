@@ -36,7 +36,7 @@ import com.example.geradorsenhas.ui.theme.GeradorSenhasTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AppNavigation( ){
+fun AppNavigation(){
     val navcontroller = rememberNavController()
 
     Scaffold(modifier = Modifier.fillMaxSize(),
@@ -80,15 +80,3 @@ fun AppNavigation( ){
     }
 }
 
-//fun inicializarBancoDeDados(){
-fun testMerge(){
-    var teste = "OK"
-}
-//}
-@Composable
-@Preview
-fun previewBarNavigation(){
-    GeradorSenhasTheme {
-//        AppNavigation()
-    }
-}
